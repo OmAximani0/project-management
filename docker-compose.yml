@@ -3,11 +3,13 @@ version: "3"
 services:
 
   backend:
-    # build: server
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    image: project-management:server
+    build: server
+    # build:
+    #   context: ./server
+    #   dockerfile: Dockerfile
+    image: omaximani/pm-be
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
     container_name: server
     restart: always
     ports:
@@ -17,10 +19,10 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       - mongo
-    env_file: ./server/.env
-    networks:
-      - express-mongo
-      - react-express
+    # env_file: ./server/.env
+    # networks:
+    #   - express-mongo
+    #   - react-express
 
   mongo:
     container_name: mongo
@@ -28,17 +30,20 @@ services:
     image: mongo:4.2.0
     volumes:
       - ./data:/data/db
-    networks:
-      - express-mongo
+    # networks:
+    #   - express-mongo
     expose:
       - 27017
 
   frontend:
-    # build: client
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    image: project-management:client
+    build: client
+    # build:
+    #   context: ./client
+    #   dockerfile: Dockerfile
+    image: omaximani/pm-fe
+    environment:
+      - REACT_APP_SERVER_GRAPHQL=http://localhost:5000/graphql
+      - REACT_APP_CLIENT_GRAPHQL=http://localhost:5000/graphql
     container_name: client
     restart: always
     ports:
@@ -47,14 +52,14 @@ services:
     volumes:
       - ./client:/usr/app
       - /usr/app/node_modules
-    networks:
-      - react-express
+    # networks:
+    #   - react-express
     depends_on:
       - backend
 
-networks:
-  react-express:
-  express-mongo:
+# networks:
+#   react-express:
+#   express-mongo:
 volumes:
   mongo-data:
     driver: local

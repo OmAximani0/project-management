@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: frontend
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: frontend
+    spec:
+      containers:
+        - env:
+            - name: REACT_APP_CLIENT_GRAPHQL
+              value: http://localhost:5000/graphql
+            - name: REACT_APP_SERVER_GRAPHQL
+              value: http://localhost:5000/graphql
+          image: omaximani/pm-fe
+          name: client
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          resources: {}
+          stdin: true
+          volumeMounts:
+            - mountPath: /usr/app
+              name: frontend-claim0
+            - mountPath: /usr/app/node_modules
+              name: frontend-claim1
+      restartPolicy: Always
+      volumes:
+        - name: frontend-claim0
+          persistentVolumeClaim:
+            claimName: frontend-claim0
+        - name: frontend-claim1
+          persistentVolumeClaim:
+            claimName: frontend-claim1
+status: {}
